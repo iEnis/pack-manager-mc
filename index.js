@@ -3,14 +3,19 @@ console.clear();
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import inquirer from "inquirer";
 import chalk from "chalk";
+const version = JSON.parse(readFileSync(`${import.meta.dirname}/package.json`).toString()).version;
 
-await inquirer.prompt([{ message: chalk.red("Please start your server once before using this tool\nOnly use the Development BP and RP folders\nRun this at the top level of the Server where the bedrock_server(.exe) is") }]);
+await inquirer.prompt([{ message: chalk.red(`Version: v${version}\nPlease start your server once before using this tool\nOnly use the Development BP and RP folders\nRun this at the top level of the Server where the bedrock_server(.exe) is`) }]);
 
 const { levelName } = await inquirer.prompt([{
-    message: chalk.yellow("Please input the level-name"),
+    message: chalk.yellow("Please select the world (worldFolderName)"),
     name: "levelName",
-    type: "input",
+    type: "checkbox",
+    choices: readdirSync("./worlds"),
 }]);
+if (!levelName || levelName.length === 0) {
+    await inquirer.prompt([{ message: chalk.red("Could not find any Worlds in your worlds folder") }])
+}
 const worldPath = `./worlds/${levelName}/`;
 
 for (const pack of ["resource", "behavior"]) {
